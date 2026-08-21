@@ -303,9 +303,9 @@ curl -X PATCH http://127.0.0.1:9090/configs \
 
 成功返回 `204 No Content`。
 
-> 本项目 `internal/client/mihomo/client.go` 中 `SwitchModes` 即通过该接口切换模式:
+> 本项目 `internal/kernel/mihomo/mihomo.go` 中 `SwitchMode` 即通过该接口切换模式:
 > ```go
-> m.apiClient.Patch("/configs", map[string]string{"mode": mode})
+> c.api.Patch("/configs", map[string]string{"mode": string(mode)})
 > ```
 
 ### 5.4 POST `/configs/geo` — 更新 GEO 数据库
@@ -1056,12 +1056,14 @@ curl -s http://127.0.0.1:9090/version \
 
 ## 19. 与本地客户端的对应关系
 
-本项目 `internal/client/mihomo/` 中的客户端封装与本文档接口的对应关系:
+本项目 `internal/kernel/mihomo/` 中的客户端封装与本文档接口的对应关系:
 
 | 本地方法 | 接口 |
 | --- | --- |
-| `Ping()` | `GET /version` |
-| `SwitchModes(mode)` | `PATCH /configs` `{"mode": mode}` |
-| `GetModes()` | 硬编码 `["Rule", "Global", "Direct"]`(对应 `mode` 可选值) |
+| `Ping()` | `GET /` |
+| `Version()` | `GET /version` |
+| `SwitchMode(mode)` | `PATCH /configs` `{"mode": mode}` |
+| `GetModes()` | 返回 `model.Mode` 常量 `[rule, global, direct]` |
+| `Restart()` | `POST /restart` |
 
-后续如需扩展(连接管理、节点测速、订阅刷新等),可直接参照上文对应接口在 `internal/client/mihomo/` 中补充实现。
+后续如需扩展(连接管理、节点测速、订阅刷新等),可直接参照上文对应接口在 `internal/kernel/mihomo/` 中补充实现。
