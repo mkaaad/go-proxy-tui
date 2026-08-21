@@ -2,6 +2,8 @@ package client
 
 type Client interface {
 	Init(Config) error
+	Ping() error
+	Version() (string error)
 	Start() error
 	Restart() error
 	End() error
