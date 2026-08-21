@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -81,8 +83,18 @@ func (c *Client) ParseSubLink(link string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := c.api.Put("/configs?force=true", map[string]string{"payload": payload}); err != nil {
-		return fmt.Errorf("[inject error]: %w", err)
+
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return fmt.Errorf("[config dir error]: %w", err)
+	}
+	dir = filepath.Join(dir, "go-proxy-tui")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return fmt.Errorf("[mkdir error]: %w", err)
+	}
+	path := filepath.Join(dir, "config.yaml")
+	if err := os.WriteFile(path, []byte(payload), 0o644); err != nil {
+		return fmt.Errorf("[write config error]: %w", err)
 	}
 	return nil
 }
