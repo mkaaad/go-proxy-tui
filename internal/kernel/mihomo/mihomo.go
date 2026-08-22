@@ -23,7 +23,11 @@ type Client struct {
 	api *rest.Client
 }
 
-func New(opts kernel.Options) (*Client, error) {
+func New() *Client {
+	return &Client{api: rest.New(defaultBaseURL, "", 15*time.Second)}
+}
+
+func NewWithOpt(opts kernel.Options) (*Client, error) {
 	if opts.URL == "" {
 		opts.URL = defaultBaseURL
 	}
@@ -64,6 +68,9 @@ func (c *Client) SwitchMode(mode string) error {
 	return err
 }
 
+func (c *Client) Start() error {
+	return nil
+}
 func (c *Client) Restart() error {
 	_, err := c.api.Post("/restart", nil)
 	return err
