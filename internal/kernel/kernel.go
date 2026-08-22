@@ -13,14 +13,24 @@ type ConfigFileInfo struct {
 	ModTime time.Time
 }
 
+type GroupInfo struct {
+	Name        string
+	MemberCount int
+	ModTime     time.Time
+}
+
 type Proxy interface {
 	Start() error
 	Ping() error
 	Restart() error
 	Stop() error
 	ParseSubLink(string) error
-	ReadConfigFile(string) (string, error)
 	ListConfigFiles() ([]ConfigFileInfo, error)
+	ReloadConfigFile(string) error
+	ReloadConfigGroup(string) error
+	CreateGroup(string) error
+	ListGroups() ([]GroupInfo, error)
+	AddToGroup(string, string, bool) error
 	GetModes() ([]string, error)
 	SwitchMode(string) error
 }
