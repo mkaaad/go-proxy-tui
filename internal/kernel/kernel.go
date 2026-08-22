@@ -1,10 +1,16 @@
-// Package kernel 定义内核适配器的公共接口与连接选项。
 package kernel
 
-// Options 描述如何连接一个内核的控制接口。
+import "time"
+
 type Options struct {
 	URL    string
 	Secret string
+}
+
+type ConfigFileInfo struct {
+	Name    string
+	Size    int64
+	ModTime time.Time
 }
 
 type Proxy interface {
@@ -13,6 +19,8 @@ type Proxy interface {
 	Restart() error
 	Stop() error
 	ParseSubLink(string) error
+	ReadConfigFile(string) (string, error)
+	ListConfigFiles() ([]ConfigFileInfo, error)
 	GetModes() ([]string, error)
 	SwitchMode(string) error
 }
