@@ -11,13 +11,13 @@ type KernelStatus int
 
 const (
 	StatusUnknown KernelStatus = iota
-	StatusRuning
+	StatusRunning
 	StatusStopped
 )
 
 func Status2String(code KernelStatus) string {
 	switch code {
-	case StatusRuning:
+	case StatusRunning:
 		return "Running"
 	case StatusStopped:
 		return "Stopped"

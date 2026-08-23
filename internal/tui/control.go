@@ -13,14 +13,14 @@ type ControlPage struct {
 }
 
 func (p *ControlPage) Refresh() {
-	online := p.state.Status == StatusRuning
+	online := p.state.Status == StatusRunning
 	busy := p.state.Busy.Load()
 	p.startBtn.SetDisabled(busy || online)
 	p.stopBtn.SetDisabled(busy || !online)
 	p.restartBtn.SetDisabled(busy || !online)
 	p.statusText.SetText("Status: " + Status2String(p.state.Status))
 }
-func NewControlPage(st *UIState) *tview.Flex {
+func GetControlFlex(st *UIState) *tview.Flex {
 	p := &ControlPage{state: st}
 	p.statusText = tview.NewTextView()
 	p.startBtn = tview.NewButton("Start").SetSelectedFunc(func() {
@@ -50,7 +50,7 @@ func (p *ControlPage) refreshStatus() {
 			if err != nil {
 				p.state.Status = StatusStopped
 			} else {
-				p.state.Status = StatusRuning
+				p.state.Status = StatusRunning
 			}
 			p.Refresh()
 		})
