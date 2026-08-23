@@ -10,7 +10,7 @@ func main() {
 	app := tview.NewApplication()
 	kernel := mihomo.New()
 	page := tview.NewPages()
-	page.AddPage("controlflex", tui.GetControlFlex(app, page, kernel), true, true)
+	page.AddPage("controlflex", tui.NewControlPage(tui.NewState(app, page, kernel)), true, true)
 	if err := app.SetRoot(page, true).EnableMouse(true).Run(); err != nil {
 		panic(err)
 	}

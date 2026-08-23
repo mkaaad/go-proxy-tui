@@ -17,6 +17,7 @@ type GroupInfo struct {
 	Name        string
 	MemberCount int
 	ModTime     time.Time
+	Configs     []string
 }
 
 type Proxy interface {

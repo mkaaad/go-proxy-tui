@@ -33,6 +33,7 @@ func (c *Client) ReloadConfigGroup(group string) error {
 		}
 	}
 	sort.Strings(names)
+
 	if len(names) == 0 {
 		return fmt.Errorf("[group empty]: %q", group)
 	}
@@ -94,6 +95,7 @@ func (c *Client) ListGroups() ([]kernel.GroupInfo, error) {
 	}
 
 	groups := make([]kernel.GroupInfo, 0, len(entries))
+
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -108,15 +110,18 @@ func (c *Client) ListGroups() ([]kernel.GroupInfo, error) {
 			return nil, fmt.Errorf("[list groups error]: %w", err)
 		}
 		memberCount := 0
+		var names []string
 		for _, groupEntry := range groupEntries {
 			if !groupEntry.IsDir() {
 				memberCount++
+				names = append(names, groupEntry.Name())
 			}
 		}
 		groups = append(groups, kernel.GroupInfo{
 			Name:        entry.Name(),
 			MemberCount: memberCount,
 			ModTime:     info.ModTime(),
+			Configs:     names,
 		})
 	}
 

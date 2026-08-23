@@ -1,52 +1,58 @@
 package tui
 
 import (
-	"github.com/mkaaad/go-proxy-tui/internal/kernel"
 	"github.com/rivo/tview"
 )
 
-func GetControlFlex(app *tview.Application, pages *tview.Pages, kernelAPI kernel.Proxy) *tview.Flex {
-	flex := tview.NewFlex()
-	var startButton, endButton, restartButton *tview.Button
+type ControlPage struct {
+	state      *UIState
+	statusText *tview.TextView
+	startBtn   *tview.Button
+	stopBtn    *tview.Button
+	restartBtn *tview.Button
+}
 
-	showStart := func() {
-		flex.RemoveItem(endButton).RemoveItem(restartButton).AddItem(startButton, 0, 1, true)
-		app.SetFocus(startButton)
-	}
-	showRunning := func() {
-		flex.RemoveItem(startButton).AddItem(endButton, 0, 1, true).AddItem(restartButton, 0, 1, true)
-		app.SetFocus(endButton)
-	}
-
-	startButton = tview.NewButton("start").SetSelectedFunc(func() {
-		if err := kernelAPI.Start(); err != nil {
-			ShowError(pages, err)
-			return
-		}
-		showRunning()
+func (p *ControlPage) Refresh() {
+	online := p.state.Status == StatusRuning
+	busy := p.state.Busy.Load()
+	p.startBtn.SetDisabled(busy || online)
+	p.stopBtn.SetDisabled(busy || !online)
+	p.restartBtn.SetDisabled(busy || !online)
+	p.statusText.SetText("Status: " + Status2String(p.state.Status))
+}
+func NewControlPage(st *UIState) *tview.Flex {
+	p := &ControlPage{state: st}
+	p.statusText = tview.NewTextView()
+	p.startBtn = tview.NewButton("Start").SetSelectedFunc(func() {
+		runAsync(p.state, p.state.Kernel.Start, p.refreshStatus)
 	})
-
-	endButton = tview.NewButton("stop").SetSelectedFunc(func() {
-		if err := kernelAPI.Stop(); err != nil {
-			if kernelAPI.Ping() != nil {
-				ShowError(pages, err, showStart)
-			} else {
-				ShowError(pages, err)
-			}
-			return
-		}
-		showStart()
+	p.stopBtn = tview.NewButton("Stop").SetSelectedFunc(func() {
+		runAsync(p.state, p.state.Kernel.Stop, p.refreshStatus)
 	})
-	restartButton = tview.NewButton("restart").SetSelectedFunc(func() {
-		if err := kernelAPI.Restart(); err != nil {
-			if kernelAPI.Ping() != nil {
-				ShowError(pages, err, showStart)
-			} else {
-				ShowError(pages, err)
-			}
-			return
-		}
+	p.restartBtn = tview.NewButton("Restart").SetSelectedFunc(func() {
+		runAsync(p.state, p.state.Kernel.Restart, p.refreshStatus)
 	})
-	flex.AddItem(startButton, 0, 1, true)
+	btnFlex := tview.NewFlex().
+		AddItem(p.startBtn, 0, 1, true).
+		AddItem(p.stopBtn, 0, 1, false).
+		AddItem(p.restartBtn, 0, 1, false)
+	flex := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(btnFlex, 0, 1, true).
+		AddItem(p.statusText, 1, 0, false)
+	p.refreshStatus()
 	return flex
+}
+func (p *ControlPage) refreshStatus() {
+	go func() {
+		err := p.state.Kernel.Ping()
+		p.state.App.QueueUpdateDraw(func() {
+			if err != nil {
+				p.state.Status = StatusStopped
+			} else {
+				p.state.Status = StatusRuning
+			}
+			p.Refresh()
+		})
+	}()
 }
