@@ -29,12 +29,9 @@ func (sub *subscription) showSubForm() {
 		AddFormItem(subscribeLink).
 		AddButton("Parse And Save", func() {
 			link := subscribeLink.GetText()
-			runAsync(sub.st, func() error {
-				return sub.st.Kernel.ParseSubLink(link)
-			}, func() {
-				sub.getNewSubList()
-				sub.st.Pages.RemovePage("subscribe form")
-			})
+			sub.st.Kernel.ParseSubLink(link)
+			sub.getNewSubList()
+			sub.st.Pages.RemovePage("subscribe form")
 		}).
 		AddButton("Clear", func() {
 			subscribeLink.SetText("")
