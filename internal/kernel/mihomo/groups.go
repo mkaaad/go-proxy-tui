@@ -12,7 +12,7 @@ import (
 
 func (c *Client) ReloadConfigGroup(group string) error {
 	if group == "" || group == "." || group == ".." || group != filepath.Base(group) {
-		return fmt.Errorf("[invalid group name]: %q", group)
+		return fmt.Errorf("[Invalid Group Name]: %q", group)
 	}
 	groupsDir, err := groupDir()
 	if err != nil {
@@ -20,11 +20,11 @@ func (c *Client) ReloadConfigGroup(group string) error {
 	}
 	groupPath := filepath.Join(groupsDir, group)
 	if info, err := os.Stat(groupPath); err != nil || !info.IsDir() {
-		return fmt.Errorf("[group not found]: %q", group)
+		return fmt.Errorf("[Group Not Found]: %q", group)
 	}
 	entries, err := os.ReadDir(groupPath)
 	if err != nil {
-		return fmt.Errorf("[read group error]: %w", err)
+		return fmt.Errorf("[Read Group Error]: %w", err)
 	}
 	var names []string
 	for _, entry := range entries {
@@ -35,13 +35,13 @@ func (c *Client) ReloadConfigGroup(group string) error {
 	sort.Strings(names)
 
 	if len(names) == 0 {
-		return fmt.Errorf("[group empty]: %q", group)
+		return fmt.Errorf("[Group Empty]: %q", group)
 	}
 	var parts []string
 	for _, name := range names {
 		data, err := os.ReadFile(filepath.Join(groupPath, name))
 		if err != nil {
-			return fmt.Errorf("[read config error]: %w", err)
+			return fmt.Errorf("[Read Config Error]: %w", err)
 		}
 		parts = append(parts, string(data))
 	}
@@ -51,14 +51,14 @@ func (c *Client) ReloadConfigGroup(group string) error {
 
 func (c *Client) CreateGroup(name string) error {
 	if name == "" || name == "." || name == ".." || name != filepath.Base(name) {
-		return fmt.Errorf("[invalid group name]: %q", name)
+		return fmt.Errorf("[Invalid Group Name]: %q", name)
 	}
 	groupsDir, err := groupDir()
 	if err != nil {
 		return err
 	}
 	if err := os.MkdirAll(groupsDir, 0o755); err != nil {
-		return fmt.Errorf("[mkdir groups error]: %w", err)
+		return fmt.Errorf("[Mkdir Groups Error]: %w", err)
 	}
 	for i := 0; ; i++ {
 		groupName := name
@@ -68,7 +68,7 @@ func (c *Client) CreateGroup(name string) error {
 		if err := os.Mkdir(filepath.Join(groupsDir, groupName), 0o755); err == nil {
 			return nil
 		} else if !os.IsExist(err) {
-			return fmt.Errorf("[mkdir group error]: %w", err)
+			return fmt.Errorf("[Mkdir Group Error]: %w", err)
 		}
 	}
 }
@@ -91,7 +91,7 @@ func (c *Client) ListGroups() ([]kernel.GroupInfo, error) {
 		return []kernel.GroupInfo{}, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("[list groups error]: %w", err)
+		return nil, fmt.Errorf("[List Groups Error]: %w", err)
 	}
 
 	groups := make([]kernel.GroupInfo, 0, len(entries))
@@ -102,12 +102,12 @@ func (c *Client) ListGroups() ([]kernel.GroupInfo, error) {
 		}
 		info, err := entry.Info()
 		if err != nil {
-			return nil, fmt.Errorf("[list groups error]: %w", err)
+			return nil, fmt.Errorf("[List Groups Error]: %w", err)
 		}
 		groupPath := filepath.Join(groupsDir, entry.Name())
 		groupEntries, err := os.ReadDir(groupPath)
 		if err != nil {
-			return nil, fmt.Errorf("[list groups error]: %w", err)
+			return nil, fmt.Errorf("[List Groups Error]: %w", err)
 		}
 		memberCount := 0
 		var names []string
@@ -133,10 +133,10 @@ func (c *Client) ListGroups() ([]kernel.GroupInfo, error) {
 
 func (c *Client) AddToGroup(group, file string, overwrite bool) error {
 	if group == "" || group == "." || group == ".." || group != filepath.Base(group) {
-		return fmt.Errorf("[invalid group name]: %q", group)
+		return fmt.Errorf("[Invalid Group Name]: %q", group)
 	}
 	if file == "" || file == "." || file == ".." || file != filepath.Base(file) {
-		return fmt.Errorf("[invalid file name]: %q", file)
+		return fmt.Errorf("[Invalid File Name]: %q", file)
 	}
 	groupsDir, err := groupDir()
 	if err != nil {
@@ -144,14 +144,14 @@ func (c *Client) AddToGroup(group, file string, overwrite bool) error {
 	}
 	groupPath := filepath.Join(groupsDir, group)
 	if info, err := os.Stat(groupPath); err != nil || !info.IsDir() {
-		return fmt.Errorf("[group not found]: %q", group)
+		return fmt.Errorf("[Group Not Found]: %q", group)
 	}
 	configsDir, err := configDir()
 	if err != nil {
 		return err
 	}
 	if _, err := os.Stat(filepath.Join(configsDir, file)); err != nil {
-		return fmt.Errorf("[config not found]: %q", file)
+		return fmt.Errorf("[Config Not Found]: %q", file)
 	}
 	linkPath := filepath.Join(groupPath, file)
 	if _, err := os.Lstat(linkPath); err == nil {
@@ -159,13 +159,13 @@ func (c *Client) AddToGroup(group, file string, overwrite bool) error {
 			return nil
 		}
 		if err := os.Remove(linkPath); err != nil {
-			return fmt.Errorf("[remove link error]: %w", err)
+			return fmt.Errorf("[Remove Link Error]: %w", err)
 		}
 	} else if !os.IsNotExist(err) {
-		return fmt.Errorf("[stat link error]: %w", err)
+		return fmt.Errorf("[Stat Link Error]: %w", err)
 	}
 	if err := os.Symlink(filepath.Join("..", "..", file), linkPath); err != nil {
-		return fmt.Errorf("[symlink error]: %w", err)
+		return fmt.Errorf("[Symlink Error]: %w", err)
 	}
 	return nil
 }

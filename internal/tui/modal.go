@@ -11,3 +11,12 @@ func showError(st *UIState, err error) {
 		})
 	st.Pages.AddPage("error", modal, true, true)
 }
+func showBusy(st *UIState) {
+	modal := tview.NewModal().
+		SetText("Kernel Busy").
+		AddButtons([]string{"OK"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			st.Pages.RemovePage("busy")
+		})
+	st.Pages.AddPage("busy", modal, true, true)
+}

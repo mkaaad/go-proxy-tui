@@ -10,8 +10,21 @@ type subscription struct {
 	selected string
 }
 
+func GetSubFlex(st *UIState) *tview.Flex {
+	sub := &subscription{st: st, list: tview.NewList()}
+	addSubBtn := tview.NewButton("Add By Sub Link").SetSelectedFunc(func() {
+		sub.showSubForm()
+	})
+	sub.getNewSubList()
+	flex := tview.NewFlex().
+		SetDirection(tview.FlexRow).
+		AddItem(sub.list, 0, 9, true).
+		AddItem(addSubBtn, 3, 1, false)
+	return flex
+}
+
 func (sub *subscription) showSubForm() {
-	subscribeLink := tview.NewInputField().SetLabel("Subscribe Link").SetFieldWidth(20).SetMaskCharacter('*')
+	subscribeLink := tview.NewInputField().SetLabel("Sub Link").SetFieldWidth(30).SetMaskCharacter('*')
 	form := tview.NewForm().
 		AddFormItem(subscribeLink).
 		AddButton("Parse And Save", func() {
@@ -31,20 +44,9 @@ func (sub *subscription) showSubForm() {
 		})
 	sub.st.Pages.AddPage("subscribe form", form, true, true)
 }
-func GetSubFlex(st *UIState) *tview.Flex {
-	sub := &subscription{st: st, list: tview.NewList()}
-	addSubBtn := tview.NewButton("Add By Sub Link").SetSelectedFunc(func() {
-		sub.showSubForm()
-	})
-	sub.getNewSubList()
-	flex := tview.NewFlex().
-		SetDirection(tview.FlexRow).
-		AddItem(sub.list, 0, 9, true).
-		AddItem(addSubBtn, 0, 1, false)
-	return flex
-}
+
 func (sub *subscription) getNewSubList() {
-	configs, err := sub.st.Kernel.ListConfigFiles()
+	configs, err := sub.st.Kernel.ListSubConfig()
 	if err != nil {
 		showError(sub.st, err)
 		return
@@ -52,7 +54,8 @@ func (sub *subscription) getNewSubList() {
 	sub.list.Clear()
 	for i, config := range configs {
 		var pre string
-		if config.Name == sub.selected {
+		isSlected := config.Name == sub.selected
+		if isSlected {
 			pre = "[x]"
 		} else {
 			pre = "[ ]"
@@ -63,14 +66,17 @@ func (sub *subscription) getNewSubList() {
 		} else {
 			shortcut = 0
 		}
-		sub.list.AddItem(pre+config.Name, config.ModTime.Format("2006-01-02"), shortcut, func() {
+		sub.list.AddItem(tview.Escape(pre+config.Name), config.ModTime.Format("2006-01-02"), shortcut, func() {
 			runAsync(sub.st, func() error {
-				return sub.st.Kernel.ReloadConfigFile(config.Name)
+				return sub.st.Kernel.LoadSubConfig(config.Name)
 			}, func() {
 				sub.selected = config.Name
 				sub.getNewSubList()
 			})
 		})
+		if isSlected {
+			sub.list.SetCurrentItem(i)
+		}
 	}
 }
 

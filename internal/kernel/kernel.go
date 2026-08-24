@@ -3,6 +3,7 @@ package kernel
 import "time"
 
 type Options struct {
+	Name   string
 	URL    string
 	Secret string
 }
@@ -12,7 +13,11 @@ type ConfigFileInfo struct {
 	Size    int64
 	ModTime time.Time
 }
-
+type KernelConfig struct {
+	Name   string
+	URL    string
+	Secret string
+}
 type GroupInfo struct {
 	Name        string
 	MemberCount int
@@ -21,13 +26,16 @@ type GroupInfo struct {
 }
 
 type Proxy interface {
+	NewConfig(Options) error
+	LoadConfig(string) error
+	ListConfig() ([]ConfigFileInfo, error)
 	Start() error
 	Ping() error
 	Restart() error
 	Stop() error
 	ParseSubLink(string) error
-	ListConfigFiles() ([]ConfigFileInfo, error)
-	ReloadConfigFile(string) error
+	ListSubConfig() ([]ConfigFileInfo, error)
+	LoadSubConfig(string) error
 	ReloadConfigGroup(string) error
 	CreateGroup(string) error
 	ListGroups() ([]GroupInfo, error)

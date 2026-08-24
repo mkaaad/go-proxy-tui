@@ -43,7 +43,6 @@ type realityOpts struct {
 	SpiderX   string `yaml:"spider-x"`
 }
 
-// clashConfig 对应注入内核的最小 mihomo 配置。
 type clashConfig struct {
 	MixedPort   int            `yaml:"mixed-port"`
 	Mode        string         `yaml:"mode"`
@@ -59,7 +58,6 @@ type proxyGroup struct {
 	Proxies []string `yaml:"proxies"`
 }
 
-// buildConfigPayload 把 vless 链接列表转成 mihomo 配置(节点 + 选择组 + MATCH 规则)。
 func buildConfigPayload(links []string) (string, error) {
 	cfg := clashConfig{
 		MixedPort: 7890,
@@ -76,7 +74,7 @@ func buildConfigPayload(links []string) (string, error) {
 		group.Proxies = append(group.Proxies, proxy.Name)
 	}
 	if len(cfg.Proxies) == 0 {
-		return "", fmt.Errorf("[parse error]: no valid vless links found")
+		return "", fmt.Errorf("[Parse Error]: no valid vless links found")
 	}
 	group.Proxies = append(group.Proxies, "DIRECT")
 	cfg.ProxyGroups = []proxyGroup{group}
@@ -84,7 +82,7 @@ func buildConfigPayload(links []string) (string, error) {
 
 	data, err := yaml.Marshal(&cfg)
 	if err != nil {
-		return "", fmt.Errorf("[marshal error]: %w", err)
+		return "", fmt.Errorf("[Marshal Error]: %w", err)
 	}
 	return string(data), nil
 }
@@ -92,7 +90,7 @@ func buildConfigPayload(links []string) (string, error) {
 func parseVlessLink(link string) (*proxyConfig, error) {
 	u, err := url.Parse(link)
 	if err != nil || u.Scheme != "vless" || u.User == nil || u.Hostname() == "" {
-		return nil, fmt.Errorf("[parse error]: unsupported link: %s", link)
+		return nil, fmt.Errorf("[Parse Error]: unsupported link: %s", link)
 	}
 
 	port := 443
@@ -170,12 +168,13 @@ func parseVlessLink(link string) (*proxyConfig, error) {
 
 	return proxy, nil
 }
-func parseLink2payload(data []byte) (string, error) {
+
+func parseLinksToPayload(data []byte) (string, error) {
 	decoded, err := base64.StdEncoding.DecodeString(string(data))
 	if err != nil {
 		decoded, err = base64.RawStdEncoding.DecodeString(string(data))
 		if err != nil {
-			return "", fmt.Errorf("[parse error]: invalid base64 subscription: %w", err)
+			return "", fmt.Errorf("[Parse Error]: invalid base64 subscription: %w", err)
 		}
 	}
 
@@ -186,7 +185,7 @@ func parseLink2payload(data []byte) (string, error) {
 		}
 	}
 	if len(rawLinks) == 0 {
-		return "", fmt.Errorf("[parse error]: subscription contains no links")
+		return "", fmt.Errorf("[Parse Error]: subscription contains no links")
 	}
 
 	payload, err := buildConfigPayload(rawLinks)
