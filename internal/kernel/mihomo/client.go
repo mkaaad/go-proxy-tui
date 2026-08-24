@@ -1,7 +1,6 @@
 package mihomo
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
@@ -42,7 +41,7 @@ func createKernelConfig(name, url, secret string) error {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("[Mkdir Error]: %w", err)
 	}
-	path, err := uniqueConfigPath(dir, name)
+	path, err := uniqueNamePath(dir, name)
 	if err != nil {
 		return err
 	}
@@ -87,12 +86,12 @@ func (c *Client) LoadConfig(name string) error {
 	if err != nil {
 		return fmt.Errorf("[Read Config Error]: %w", err)
 	}
-	var kernel kernel.KernelConfig
-	err = json.Unmarshal(data, &kernel)
+	var cfg kernel.KernelConfig
+	err = yaml.Unmarshal(data, &cfg)
 	if err != nil {
 		return fmt.Errorf("[Parse Config Error]: %w", err)
 	}
-	c.api = rest.New(kernel.URL, kernel.Secret, 15*time.Second)
+	c.api = rest.New(cfg.URL, cfg.Secret, 15*time.Second)
 	return nil
 }
 func (c *Client) ListConfig() ([]kernel.ConfigFileInfo, error) {

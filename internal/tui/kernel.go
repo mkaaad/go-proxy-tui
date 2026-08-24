@@ -21,7 +21,6 @@ type kernelStatus struct {
 type kernelConfig struct {
 	st   *UIState
 	list *tview.List
-	done chan struct{}
 }
 
 func (k *kernelConfig) showKernelConfigForm() {
@@ -29,15 +28,23 @@ func (k *kernelConfig) showKernelConfigForm() {
 	urlField := tview.NewInputField().SetLabel("URL").SetFieldWidth(30)
 	secretField := tview.NewInputField().SetLabel("Secret").SetFieldWidth(30).SetMaskCharacter('*')
 	form := tview.NewForm().
+		AddFormItem(kernelConfigNameField).
+		AddFormItem(urlField).
 		AddFormItem(secretField).
 		AddButton("Create", func() {
-			k.st.Kernel.NewConfig(kernel.Options{
+			err := k.st.Kernel.NewConfig(kernel.Options{
 				Name:   kernelConfigNameField.GetText(),
 				URL:    urlField.GetText(),
 				Secret: secretField.GetText(),
 			})
+			if err != nil {
+				showError(k.st, err)
+				return
+			}
 			k.st.Pages.RemovePage("kernel config form")
+			k.st.Ready = true
 			k.getNewConfigList()
+			k.st.enterMain()
 		}).
 		AddButton("Clear", func() {
 			kernelConfigNameField.SetText("")
@@ -46,9 +53,8 @@ func (k *kernelConfig) showKernelConfigForm() {
 		}).
 		AddButton("Cancel", func() {
 			k.st.Pages.RemovePage("kernel config form")
-		}).
-		SetBorder(true).
-		SetTitle("Add New Kernel Config")
+		})
+	form.SetBorder(true).SetTitle("Add New Kernel Config")
 	k.st.Pages.AddPage("kernel config form", form, true, true)
 }
 
@@ -59,6 +65,9 @@ func (k *kernelConfig) getNewConfigList() {
 		return
 	}
 	k.list.Clear()
+	if len(configs) == 0 {
+		k.list.AddItem("No Config File Found", "", 0, func() {})
+	}
 	for i, config := range configs {
 		var shortcut rune
 		if i >= 10 {
@@ -72,26 +81,29 @@ func (k *kernelConfig) getNewConfigList() {
 				showError(k.st, err)
 				return
 			}
-			k.done <- struct{}{}
-			k.st.Pages.RemovePage("Config List")
+			k.st.Ready = true
+			k.st.enterMain()
 		})
 	}
 }
 
-func ShowKernelConfigPage(st *UIState, done chan struct{}) {
+func ShowKernelConfigPage(st *UIState) {
 	kc := kernelConfig{
 		st:   st,
 		list: tview.NewList(),
-		done: done,
 	}
 	kc.getNewConfigList()
 	newBtn := tview.NewButton("New").SetSelectedFunc(func() {
 		kc.showKernelConfigForm()
 	})
+	backBtn := tview.NewButton("Back").SetSelectedFunc(func() {
+		st.enterMain()
+	})
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(kc.list, 0, 9, true).
-		AddItem(newBtn, 0, 1, true)
-	st.Pages.AddPage("Config List", flex, true, true)
+		AddItem(newBtn, 0, 1, true).
+		AddItem(backBtn, 0, 1, true)
+	st.Pages.AddPage(pageKernelConfig, flex, true, true)
 }
 func GetKernelFlex(st *UIState) *tview.Flex {
 	k := &kernelStatus{state: st}
@@ -102,9 +114,13 @@ func GetKernelFlex(st *UIState) *tview.Flex {
 			k.lastManualRefreshTime = time.Now()
 		})
 	})
+	configBtn := tview.NewButton("Config").SetSelectedFunc(func() {
+		k.state.openConfig()
+	})
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(k.restartBtn, 0, 4, true).
+		AddItem(configBtn, 0, 4, true).
 		AddItem(k.statusText, 0, 1, false)
 	k.refreshStatus()
 	go k.refreshCron()

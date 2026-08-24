@@ -37,7 +37,7 @@ func (c *Client) ParseSubLink(link string) error {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("[Mkdir Error]: %w", err)
 	}
-	path, err := uniqueConfigPath(dir, link)
+	path, err := uniqueSubPath(dir, link)
 	if err != nil {
 		return err
 	}

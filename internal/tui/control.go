@@ -23,22 +23,3 @@ func GetControlFlex(st *UIState) *tview.Flex {
 		AddItem(p.disableBtn, 0, 1, false)
 	return flex
 }
-
-/*func (p *ControlPage) Refresh() {
-	online := p.state.Status == StatusRunning
-	p.startBtn.SetDisabled(online)
-	p.stopBtn.SetDisabled(!online)
-}
-func (p *ControlPage) refreshStatus() {
-	go func() {
-		err := p.state.Kernel.Ping()
-		p.state.App.QueueUpdateDraw(func() {
-			if err != nil {
-				p.state.Status = StatusStopped
-			} else {
-				p.state.Status = StatusRunning
-			}
-			p.Refresh()
-		})
-	}()
-}*/

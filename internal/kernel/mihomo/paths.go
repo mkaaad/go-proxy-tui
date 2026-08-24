@@ -30,7 +30,7 @@ func secondLevelDomain(host string) string {
 	return host
 }
 
-func uniqueConfigPath(dir, link string) (string, error) {
+func uniqueSubPath(dir, link string) (string, error) {
 	u, err := url.Parse(link)
 	if err != nil {
 		return "", fmt.Errorf("[Parse Error]: invalid subscription link: %w", err)
@@ -39,6 +39,19 @@ func uniqueConfigPath(dir, link string) (string, error) {
 	if base == "" {
 		return "", fmt.Errorf("[Parse Error]: subscription link has no host")
 	}
+	return createUniqueFile(dir, base)
+}
+
+func uniqueNamePath(dir, name string) (string, error) {
+	base := strings.TrimSpace(sanitizeFileNameBase(name))
+	base = strings.Trim(base, ".")
+	if base == "" || base == "." || base == ".." {
+		return "", fmt.Errorf("[Invalid Name]: %q", name)
+	}
+	return createUniqueFile(dir, base)
+}
+
+func createUniqueFile(dir, base string) (string, error) {
 	for i := 0; ; i++ {
 		name := base + ".yaml"
 		if i > 0 {

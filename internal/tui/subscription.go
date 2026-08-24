@@ -52,6 +52,9 @@ func (sub *subscription) getNewSubList() {
 		return
 	}
 	sub.list.Clear()
+	if len(configs) == 0 {
+		sub.list.AddItem("No Config File Found", "", 0, func() {})
+	}
 	for i, config := range configs {
 		var pre string
 		isSlected := config.Name == sub.selected

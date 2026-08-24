@@ -27,10 +27,12 @@ func Status2String(code KernelStatus) string {
 }
 
 type UIState struct {
-	App    *tview.Application
-	Pages  *tview.Pages
-	Kernel kernel.Proxy
-	Status KernelStatus
+	App      *tview.Application
+	Pages    *tview.Pages
+	Kernel   kernel.Proxy
+	Status   KernelStatus
+	Ready    bool
+	mainFlex *tview.Flex
 	//Version string
 	Busy atomic.Bool
 }
