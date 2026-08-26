@@ -5,6 +5,12 @@ import (
 	"fmt"
 )
 
+const (
+	modeRule   = "rule"
+	modeGlobal = "global"
+	modeDirect = "direct"
+)
+
 func (c *Client) Ping() error {
 	_, err := c.api.Get("/")
 	return err

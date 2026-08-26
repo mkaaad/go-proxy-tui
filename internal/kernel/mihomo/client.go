@@ -15,11 +15,6 @@ import (
 )
 
 const defaultBaseURL = "http://127.0.0.1:9090"
-const (
-	modeRule   = "rule"
-	modeGlobal = "global"
-	modeDirect = "direct"
-)
 
 type Client struct {
 	api *rest.Client
