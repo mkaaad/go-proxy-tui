@@ -13,10 +13,10 @@ type ControlPage struct {
 func GetControlFlex(st *UIState) *tview.Flex {
 	p := &ControlPage{state: st}
 	p.enableBtn = tview.NewButton("Enable").SetSelectedFunc(func() {
-		runAsync(p.state, p.state.Kernel.Start, nil)
+		runAsync(p.state, p.state.Kernel.Enable, nil)
 	})
 	p.disableBtn = tview.NewButton("Disable").SetSelectedFunc(func() {
-		runAsync(p.state, p.state.Kernel.Stop, nil)
+		runAsync(p.state, p.state.Kernel.Enable, nil)
 	})
 	flex := tview.NewFlex().
 		AddItem(p.enableBtn, 0, 1, true).

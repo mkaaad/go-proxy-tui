@@ -10,7 +10,7 @@ type modeStruct struct {
 }
 
 func GetModeFlex(st *UIState) *tview.Flex {
-	modes, err := st.Kernel.GetModes()
+	modes, err := st.Kernel.ListModes()
 	if err != nil {
 		showError(st, err)
 	}

@@ -13,8 +13,8 @@ func (st *UIState) enterMain() {
 	}
 	if st.mainFlex == nil {
 		controlFlex := tview.NewFlex().
-			AddItem(GetControlFlex(st), 0, 6, true).
-			AddItem(GetKernelFlex(st), 0, 4, false)
+			AddItem(GetControlFlex(st), 0, 1, true).
+			AddItem(GetKernelFlex(st), 15, 1, false)
 		st.mainFlex = tview.NewFlex().
 			SetDirection(tview.FlexRow).
 			AddItem(GetSubFlex(st), 0, 9, true)

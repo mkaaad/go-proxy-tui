@@ -61,6 +61,9 @@ func (c *Client) NewConfig(opts kernel.Options) error {
 	if _, err := url.ParseRequestURI(opts.URL); err != nil {
 		return fmt.Errorf("[URL Wrong]: %w", err)
 	}
+	if opts.Name == "" {
+		opts.Name = "mihomo"
+	}
 	err := createKernelConfig(opts.Name, opts.URL, opts.Secret)
 	if err != nil {
 		return err
@@ -89,6 +92,7 @@ func (c *Client) LoadConfig(name string) error {
 	c.api = rest.New(cfg.URL, cfg.Secret, 15*time.Second)
 	return nil
 }
+
 func (c *Client) ListConfig() ([]kernel.ConfigFileInfo, error) {
 	dir, err := kernelConfigDir()
 	if err != nil {

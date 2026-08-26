@@ -44,9 +44,9 @@ type realityOpts struct {
 }
 
 type clashConfig struct {
-	MixedPort   int            `yaml:"mixed-port"`
-	Mode        string         `yaml:"mode"`
-	LogLevel    string         `yaml:"log-level"`
+	//MixedPort   int            `yaml:"mixed-port"`
+	//Mode        string         `yaml:"mode"`
+	//LogLevel    string         `yaml:"log-level"`
 	Proxies     []*proxyConfig `yaml:"proxies"`
 	ProxyGroups []proxyGroup   `yaml:"proxy-groups"`
 	Rules       []string       `yaml:"rules"`
@@ -59,11 +59,7 @@ type proxyGroup struct {
 }
 
 func buildConfigPayload(links []string) (string, error) {
-	cfg := clashConfig{
-		MixedPort: 7890,
-		Mode:      modeRule,
-		LogLevel:  "info",
-	}
+	cfg := clashConfig{}
 	group := proxyGroup{Name: "PROXY", Type: "select"}
 	for _, link := range links {
 		proxy, err := parseVlessLink(link)

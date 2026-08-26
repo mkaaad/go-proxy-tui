@@ -11,6 +11,13 @@ const (
 	modeDirect = "direct"
 )
 
+type tun struct {
+	Enable    bool   `json:"enable"`
+	Stack     string `json:"stack"`
+	Device    string `json:"device"`
+	AutoRoute bool   `json:"auto-route"`
+}
+
 func (c *Client) Ping() error {
 	_, err := c.api.Get("/")
 	return err
@@ -30,7 +37,7 @@ func (c *Client) Version() (string, error) {
 	return resp.Version, nil
 }
 
-func (c *Client) GetModes() ([]string, error) {
+func (c *Client) ListModes() ([]string, error) {
 	return []string{modeRule, modeGlobal, modeDirect}, nil
 }
 
@@ -39,8 +46,17 @@ func (c *Client) SwitchMode(mode string) error {
 	return err
 }
 
-func (c *Client) Start() error {
-	return nil
+func (c *Client) Enable() error {
+	t := tun{
+		Enable:    true,
+		Stack:     "mixed",
+		Device:    "mihomo",
+		AutoRoute: true,
+	}
+	_, err := c.api.Patch("/configs", map[string]tun{
+		"tun": t,
+	})
+	return err
 }
 
 func (c *Client) Restart() error {
@@ -48,6 +64,12 @@ func (c *Client) Restart() error {
 	return err
 }
 
-func (c *Client) Stop() error {
-	return nil
+func (c *Client) Disable() error {
+	t := tun{
+		Enable: false,
+	}
+	_, err := c.api.Patch("/configs", map[string]tun{
+		"tun": t,
+	})
+	return err
 }

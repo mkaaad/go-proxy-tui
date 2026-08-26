@@ -29,10 +29,10 @@ type Proxy interface {
 	NewConfig(Options) error
 	LoadConfig(string) error
 	ListConfig() ([]ConfigFileInfo, error)
-	Start() error
+	Enable() error
 	Ping() error
 	Restart() error
-	Stop() error
+	Disable() error
 	ParseSubLink(string) error
 	ListSubConfig() ([]ConfigFileInfo, error)
 	LoadSubConfig(string) error
@@ -40,6 +40,6 @@ type Proxy interface {
 	CreateGroup(string) error
 	ListGroups() ([]GroupInfo, error)
 	AddToGroup(string, string, bool) error
-	GetModes() ([]string, error)
+	ListModes() ([]string, error)
 	SwitchMode(string) error
 }

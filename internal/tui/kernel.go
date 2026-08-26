@@ -27,7 +27,7 @@ func GetKernelFlex(st *UIState) *tview.Flex {
 			k.lastManualRefreshTime = time.Now()
 		})
 	})
-	configBtn := tview.NewButton("New Config").SetSelectedFunc(func() {
+	configBtn := tview.NewButton("Kernel Configs").SetSelectedFunc(func() {
 		k.state.openConfig()
 	})
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).

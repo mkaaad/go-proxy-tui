@@ -88,7 +88,7 @@ func ShowKernelConfigPage(st *UIState) {
 	})
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(kc.list, 0, 9, true).
-		AddItem(newBtn, 0, 1, true).
-		AddItem(backBtn, 0, 1, true)
+		AddItem(newBtn, 0, 1, false).
+		AddItem(backBtn, 0, 1, false)
 	st.Pages.AddPage(pageKernelConfig, flex, true, true)
 }
