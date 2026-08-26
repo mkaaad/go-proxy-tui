@@ -22,10 +22,12 @@ func GetKernelFlex(st *UIState) *tview.Flex {
 	k := &kernelStatus{state: st}
 	k.statusText = tview.NewTextView()
 	k.restartBtn = tview.NewButton("Restart").SetSelectedFunc(func() {
-		runAsync(k.state, k.state.Kernel.Restart, func() {
-			k.refreshStatus()
-			k.lastManualRefreshTime = time.Now()
-		})
+		err := st.Kernel.Restart()
+		if err != nil {
+			showError(st, err)
+		}
+		k.refreshStatus()
+		k.lastManualRefreshTime = time.Now()
 	})
 	configBtn := tview.NewButton("Kernel Configs").SetSelectedFunc(func() {
 		k.state.openConfig()

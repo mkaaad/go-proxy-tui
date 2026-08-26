@@ -22,6 +22,7 @@ func GetModeFlex(st *UIState) *tview.Flex {
 		flex.AddItem(
 			modeBtn.SetSelectedFunc(func() {
 				err := st.Kernel.SwitchMode(mode)
+				st.App.SetFocus(nil)
 				if err != nil {
 					showError(st, err)
 					return

@@ -29,7 +29,11 @@ func (sub *subscription) showSubForm() {
 		AddFormItem(subscribeLink).
 		AddButton("Parse And Save", func() {
 			link := subscribeLink.GetText()
-			sub.st.Kernel.ParseSubLink(link)
+			err := sub.st.Kernel.ParseSubLink(link)
+			if err != nil {
+				showError(sub.st, err)
+				return
+			}
 			sub.getNewSubList()
 			sub.st.Pages.RemovePage("subscribe form")
 		}).
@@ -67,12 +71,12 @@ func (sub *subscription) getNewSubList() {
 			shortcut = 0
 		}
 		sub.list.AddItem(tview.Escape(pre+config.Name), config.ModTime.Format("2006-01-02"), shortcut, func() {
-			runAsync(sub.st, func() error {
-				return sub.st.Kernel.LoadSubConfig(config.Name)
-			}, func() {
-				sub.selected = config.Name
-				sub.getNewSubList()
-			})
+			err := sub.st.Kernel.LoadSubConfig(config.Name)
+			if err != nil {
+				showError(sub.st, err)
+			}
+			sub.selected = config.Name
+			sub.getNewSubList()
 		})
 		if isSlected {
 			sub.list.SetCurrentItem(i)

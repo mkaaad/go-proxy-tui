@@ -84,6 +84,7 @@ func ShowKernelConfigPage(st *UIState) {
 		kc.showKernelConfigForm()
 	})
 	backBtn := tview.NewButton("Back").SetSelectedFunc(func() {
+		st.App.SetFocus(nil)
 		st.enterMain()
 	})
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).

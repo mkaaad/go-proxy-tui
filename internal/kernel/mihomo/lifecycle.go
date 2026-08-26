@@ -12,10 +12,10 @@ const (
 )
 
 type tun struct {
-	Enable    bool   `json:"enable"`
-	Stack     string `json:"stack"`
-	Device    string `json:"device"`
-	AutoRoute bool   `json:"auto-route"`
+	Enable    bool   `json:"enable,omitempty"`
+	Stack     string `json:"stack,omitempty"`
+	Device    string `json:"device,omitempty"`
+	AutoRoute bool   `json:"auto-route,omitempty"`
 }
 
 func (c *Client) Ping() error {
@@ -67,6 +67,7 @@ func (c *Client) Restart() error {
 func (c *Client) Disable() error {
 	t := tun{
 		Enable: false,
+		Device: "mihomo",
 	}
 	_, err := c.api.Patch("/configs", map[string]tun{
 		"tun": t,

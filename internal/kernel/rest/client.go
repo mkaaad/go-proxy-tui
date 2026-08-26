@@ -19,9 +19,9 @@ type APIError struct {
 
 func (e *APIError) Error() string {
 	if e.Message == "" {
-		return fmt.Sprintf("[api error]: %s", http.StatusText(e.Status))
+		return fmt.Sprintf("[Api Error]: %s", http.StatusText(e.Status))
 	}
-	return fmt.Sprintf("[api error]: [%d]: %s", e.Status, e.Message)
+	return fmt.Sprintf("[Api Error]: [%d]: %s", e.Status, e.Message)
 }
 
 func New(baseURL, secret string, timeout time.Duration) *Client {
@@ -57,7 +57,7 @@ func (c *Client) Delete(path string, body any) ([]byte, error) {
 func (c *Client) do(method, path string, body any) ([]byte, error) {
 	resp, err := c.R().SetBody(body).Execute(method, path)
 	if err != nil {
-		return nil, fmt.Errorf("[network error]: %w", err)
+		return nil, fmt.Errorf("[Network Error]: %w", err)
 	}
 	if resp.IsError() {
 		apiErr := &APIError{Status: resp.StatusCode(), Message: string(resp.Body())}
