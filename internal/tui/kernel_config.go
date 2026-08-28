@@ -29,9 +29,9 @@ func (k *kernelConfig) showKernelConfigForm() {
 				return
 			}
 			k.st.Pages.RemovePage("kernel config form")
-			k.st.Ready = true
 			k.getNewConfigList()
-			k.st.enterMain()
+			k.st.HasConfig = true
+			k.st.initPages()
 		}).
 		AddButton("Clear", func() {
 			kernelConfigNameField.SetText("")
@@ -62,34 +62,35 @@ func (k *kernelConfig) getNewConfigList() {
 		} else {
 			shortcut = rune('0' + i)
 		}
-		k.list.AddItem(tview.Escape(config.Name), config.ModTime.Format("2006-01-02"), shortcut, func() {
-			err := k.st.Kernel.LoadConfig(config.Name)
-			if err != nil {
-				showError(k.st, err)
-				return
-			}
-			k.st.Ready = true
-			k.st.enterMain()
+		k.list.AddItem(config.Name, config.ModTime.Format("2006-01-02"), shortcut, func() {
+			k.loadConfig(config.Name)
 		})
 	}
+	k.list.SetBorder(true).SetTitle("Kernel Config")
 }
 
-func ShowKernelConfigPage(st *UIState) {
+func (k *kernelConfig) loadConfig(configName string) {
+	err := k.st.Kernel.LoadConfig(configName)
+	if err != nil {
+		showError(k.st, err)
+		return
+	}
+	k.st.HasConfig = true
+	k.st.initPages()
+	k.st.Pages.SwitchToPage(PageSubcription)
+
+}
+func GetKernelConfigFlex(st *UIState) *tview.Flex {
 	kc := kernelConfig{
 		st:   st,
 		list: tview.NewList(),
 	}
 	kc.getNewConfigList()
-	newBtn := tview.NewButton("New").SetSelectedFunc(func() {
+	newBtn := tview.NewButton("New Kernel Config").SetSelectedFunc(func() {
 		kc.showKernelConfigForm()
-	})
-	backBtn := tview.NewButton("Back").SetSelectedFunc(func() {
-		st.App.SetFocus(nil)
-		st.enterMain()
 	})
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(kc.list, 0, 9, true).
-		AddItem(newBtn, 0, 1, false).
-		AddItem(backBtn, 0, 1, false)
-	st.Pages.AddPage(pageKernelConfig, flex, true, true)
+		AddItem(newBtn, 0, 1, false)
+	return flex
 }

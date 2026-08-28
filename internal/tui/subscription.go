@@ -82,6 +82,7 @@ func (sub *subscription) getNewSubList() {
 			sub.list.SetCurrentItem(i)
 		}
 	}
+	sub.list.SetBorder(true).SetTitle("Subscriptions")
 }
 
 /*

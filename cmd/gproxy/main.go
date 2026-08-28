@@ -10,8 +10,7 @@ func main() {
 	app := tview.NewApplication()
 	page := tview.NewPages()
 	st := tui.NewState(app, page, &mihomo.Client{})
-	tui.ShowKernelConfigPage(st)
-
+	page.AddPage(tui.PageKernelConfig, tui.GetConfigTabFlex(st), true, true)
 	if err := app.SetRoot(page, true).EnableMouse(true).Run(); err != nil {
 		panic(err)
 	}

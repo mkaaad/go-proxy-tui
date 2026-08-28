@@ -27,14 +27,13 @@ func Status2String(code KernelStatus) string {
 }
 
 type UIState struct {
-	App      *tview.Application
-	Pages    *tview.Pages
-	Kernel   kernel.Proxy
-	Status   KernelStatus
-	Ready    bool
-	mainFlex *tview.Flex
+	App    *tview.Application
+	Pages  *tview.Pages
+	Kernel kernel.Proxy
+	Status KernelStatus
 	//Version string
-	Busy atomic.Bool
+	Busy      atomic.Bool
+	HasConfig bool
 }
 
 func NewState(app *tview.Application, pages *tview.Pages, kernelAPI kernel.Proxy) *UIState {

@@ -29,12 +29,8 @@ func GetKernelFlex(st *UIState) *tview.Flex {
 		k.refreshStatus()
 		k.lastManualRefreshTime = time.Now()
 	})
-	configBtn := tview.NewButton("Kernel Configs").SetSelectedFunc(func() {
-		k.state.openConfig()
-	})
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(k.restartBtn, 0, 1, true).
-		AddItem(configBtn, 0, 1, true).
 		AddItem(k.statusText, 1, 1, false)
 	k.refreshStatus()
 	go k.refreshCron()
@@ -65,7 +61,7 @@ func (k *kernelStatus) refreshStatus() {
 	}, func() {
 		isOnline := k.state.Status == StatusRunning
 		k.restartBtn.SetDisabled(!isOnline)
-		k.statusText.SetText("Status: " + Status2String(k.state.Status))
+		k.statusText.SetText("Status: " + Status2String(k.state.Status)).SetTextAlign(tview.AlignCenter)
 	})
 }
 func capitalize(s string) string {
