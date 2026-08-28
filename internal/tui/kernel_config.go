@@ -66,7 +66,6 @@ func (k *kernelConfig) getNewConfigList() {
 			k.loadConfig(config.Name)
 		})
 	}
-	k.list.SetBorder(true).SetTitle("Kernel Config")
 }
 
 func (k *kernelConfig) loadConfig(configName string) {
@@ -92,5 +91,7 @@ func GetKernelConfigFlex(st *UIState) *tview.Flex {
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(kc.list, 0, 9, true).
 		AddItem(newBtn, 0, 1, false)
+	flex.SetBorder(true).SetTitle("Kernel Config")
+
 	return flex
 }

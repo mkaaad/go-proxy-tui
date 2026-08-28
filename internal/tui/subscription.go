@@ -20,6 +20,8 @@ func GetSubFlex(st *UIState) *tview.Flex {
 		SetDirection(tview.FlexRow).
 		AddItem(sub.list, 0, 9, true).
 		AddItem(addSubBtn, 3, 1, false)
+
+	flex.SetBorder(true).SetTitle("Subscriptions")
 	return flex
 }
 
@@ -82,7 +84,6 @@ func (sub *subscription) getNewSubList() {
 			sub.list.SetCurrentItem(i)
 		}
 	}
-	sub.list.SetBorder(true).SetTitle("Subscriptions")
 }
 
 /*

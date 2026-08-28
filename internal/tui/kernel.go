@@ -1,9 +1,11 @@
 package tui
 
 import (
+	"errors"
 	"strings"
 	"time"
 
+	"github.com/mkaaad/go-proxy-tui/internal/kernel"
 	"github.com/rivo/tview"
 )
 
@@ -21,6 +23,8 @@ type kernelStatus struct {
 func GetKernelFlex(st *UIState) *tview.Flex {
 	k := &kernelStatus{state: st}
 	k.statusText = tview.NewTextView()
+	k.state.Status = StatusUnknown
+	k.statusText.SetText("Status: " + Status2String(StatusUnknown)).SetTextAlign(tview.AlignCenter)
 	k.restartBtn = tview.NewButton("Restart").SetSelectedFunc(func() {
 		err := st.Kernel.Restart()
 		if err != nil {
@@ -53,9 +57,12 @@ func (k *kernelStatus) refreshCron() {
 func (k *kernelStatus) refreshStatus() {
 	pingAsync(k.state, func() {
 		err := k.state.Kernel.Ping()
-		if err != nil {
+		switch {
+		case errors.Is(err, kernel.ErrNotConfigured):
+			k.state.Status = StatusUnknown
+		case err != nil:
 			k.state.Status = StatusStopped
-		} else {
+		default:
 			k.state.Status = StatusRunning
 		}
 	}, func() {

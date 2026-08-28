@@ -74,14 +74,14 @@ func GetConfigTabFlex(st *UIState) *tview.Flex {
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(GetKernelConfigFlex(st), 0, 9, true)
-	//controlFlex := tview.NewFlex().
-	//	AddItem(GetControlFlex(st), 0, 1, true).
-	//	AddItem(GetKernelFlex(st), 15, 1, false)
+	controlFlex := tview.NewFlex().
+		AddItem(GetControlFlex(st), 0, 1, true).
+		AddItem(GetKernelFlex(st), 15, 1, false)
 	modeFlex := GetModeFlex(st)
 	if modeFlex != nil {
 		flex.AddItem(modeFlex, 0, 1, false)
 	}
-	//flex.AddItem(controlFlex, 0, 1, false)
+	flex.AddItem(controlFlex, 0, 1, false)
 	subTabFlex := tview.NewFlex().
 		AddItem(flex, 0, 9, true).
 		AddItem(GetTabFlex(st), 0, 1, false)

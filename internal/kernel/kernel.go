@@ -26,6 +26,7 @@ type GroupInfo struct {
 }
 
 type Proxy interface {
+	Ready() bool
 	NewConfig(Options) error
 	LoadConfig(string) error
 	ListConfig() ([]ConfigFileInfo, error)

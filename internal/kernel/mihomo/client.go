@@ -20,6 +20,8 @@ type Client struct {
 	api *rest.Client
 }
 
+func (c *Client) Ready() bool { return c.api != nil }
+
 func kernelConfigDir() (string, error) {
 	dir, err := configDir()
 	if err != nil {
