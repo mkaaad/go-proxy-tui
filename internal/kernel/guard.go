@@ -65,3 +65,10 @@ func (g *guardedProxy) LoadSubConfig(name string) error {
 	}
 	return g.Proxy.LoadSubConfig(name)
 }
+
+func (g *guardedProxy) ListProxies() ([]ProxyInfo, error) {
+	if err := g.require(); err != nil {
+		return nil, err
+	}
+	return g.Proxy.ListProxies()
+}

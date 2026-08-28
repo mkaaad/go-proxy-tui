@@ -6,12 +6,14 @@ import (
 
 const (
 	PageSubcription  = "subscription"
+	PageProxies      = "proxies"
 	PageKernelConfig = "kernel-config"
 )
 
 func (st *UIState) initPages() {
 	st.Pages.
-		AddPage(PageSubcription, GetSubTabFlex(st), true, false)
+		AddPage(PageSubcription, GetSubTabFlex(st), true, false).
+		AddPage(PageProxies, GetProxiesTabFlex(st), true, false)
 }
 
 func GetTabFlex(st *UIState) *tview.Flex {
@@ -20,7 +22,11 @@ func GetTabFlex(st *UIState) *tview.Flex {
 			st.Pages.SwitchToPage(PageSubcription)
 		}
 	})
-	proxiesBtn := tview.NewButton("Proxies")
+	proxiesBtn := tview.NewButton("Proxies").SetSelectedFunc(func() {
+		if st.HasConfig {
+			st.Pages.SwitchToPage(PageProxies)
+		}
+	})
 	configBtn := tview.NewButton("Config").SetSelectedFunc(func() {
 		if st.HasConfig {
 			st.Pages.SwitchToPage(PageKernelConfig)
@@ -52,10 +58,9 @@ func GetSubTabFlex(st *UIState) *tview.Flex {
 
 }
 func GetProxiesTabFlex(st *UIState) *tview.Flex {
-	//TODO
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(nil, 0, 9, true)
+		AddItem(GetProxiesFlex(st), 0, 9, true)
 	controlFlex := tview.NewFlex().
 		AddItem(GetControlFlex(st), 0, 1, true).
 		AddItem(GetKernelFlex(st), 15, 1, false)
@@ -65,8 +70,8 @@ func GetProxiesTabFlex(st *UIState) *tview.Flex {
 	}
 	flex.AddItem(controlFlex, 0, 1, false)
 	subTabFlex := tview.NewFlex().
-		AddItem(flex, 0, 9, false).
-		AddItem(GetTabFlex(st), 0, 1, true)
+		AddItem(flex, 0, 9, true).
+		AddItem(GetTabFlex(st), 0, 1, false)
 	return subTabFlex
 
 }

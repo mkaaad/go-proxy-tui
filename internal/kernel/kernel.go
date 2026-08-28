@@ -24,6 +24,14 @@ type GroupInfo struct {
 	ModTime     time.Time
 	Configs     []string
 }
+type ProxyInfo struct {
+	Name  string
+	Type  string
+	Now   string
+	All   []string
+	Delay int
+	Alive bool
+}
 
 type Proxy interface {
 	Ready() bool
@@ -43,4 +51,5 @@ type Proxy interface {
 	AddToGroup(string, string, bool) error
 	ListModes() ([]string, error)
 	SwitchMode(string) error
+	ListProxies() ([]ProxyInfo, error)
 }
