@@ -59,7 +59,7 @@ func (c *Client) LoadSubConfig(name string) error {
 	if err != nil {
 		return fmt.Errorf("[Read Config Error]: %w", err)
 	}
-	_, err = c.api.Patch("/configs?force=true", map[string]string{"payload": string(data)})
+	_, err = c.api.Put("/configs?force=true", map[string]string{"payload": string(data)})
 	return err
 }
 
