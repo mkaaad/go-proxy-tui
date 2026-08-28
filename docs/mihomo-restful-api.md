@@ -332,15 +332,12 @@ curl -s http://127.0.0.1:9090/proxies
     "PROXY": {
       "type": "Selector",
       "name": "PROXY",
-      "history": [],
-      "all": ["🇺🇸 US-01", "🇯🇵 JP-01", "DIRECT"],
       "now": "🇺🇸 US-01",
-      "udp": true,
-      "xudp": false,
-      "tfo": false,
-      "mptcp": false,
+      "all": ["🇺🇸 US-01", "🇯🇵 JP-01", "DIRECT"],
+      "history": [],
+      "extra": {},
       "alive": true,
-      "delay": 128
+      "udp": true
     },
     "🇺🇸 US-01": {
       "type": "Vless",
@@ -348,16 +345,22 @@ curl -s http://127.0.0.1:9090/proxies
       "history": [
         { "time": "2026-08-21T18:00:00+08:00", "delay": 128 }
       ],
-      "udp": true,
-      "xudp": false,
-      "tfo": false,
-      "mptcp": false,
+      "extra": {
+        "http://www.gstatic.com/generate_204": {
+          "alive": true,
+          "history": [
+            { "time": "2026-08-21T18:00:00+08:00", "delay": 128 }
+          ]
+        }
+      },
       "alive": true,
-      "delay": 128
+      "udp": true
     }
   }
 }
 ```
+
+> ⚠️ 代理对象**没有顶层 `delay` 字段**,延迟数据在 `history` 数组的每一项里(最后一项即最近一次延迟)。
 
 字段说明:
 
@@ -365,12 +368,12 @@ curl -s http://127.0.0.1:9090/proxies
 | --- | --- |
 | `type` | 代理类型:`Selector` / `URLTest` / `Fallback` / `LoadBalance` / `Direct` / `Reject` / `Vmess` / `Vless` / `Trojan` / `Shadowsocks` / `Hysteria2` / `Tuic` / `Wireguard` 等 |
 | `name` | 代理名 |
-| `history` | 延迟测试历史记录 |
+| `now` | 仅策略组:当前选中的代理 |
 | `all` | 仅策略组:包含的全部可选代理 |
-| `now` | 仅选择器:当前选中的代理 |
+| `history` | 延迟测试历史数组,每项为 `{ "time": ..., "delay": ms }`;取最后一项即最近一次延迟,未测速过为空数组 `[]` |
+| `extra` | 按测试 URL 分组的额外延迟历史 `{ url: { "alive": ..., "history": [...] } }`;未用自定义 URL 测速时为空对象 `{}` |
+| `alive` | 最近一次测速是否存活;**未测速过也默认为 `true`**,需结合 `history` 是否有数据判断 |
 | `udp` / `xudp` / `tfo` / `mptcp` | 协议特性支持情况 |
-| `alive` | 节点是否可用(最近延迟测试结果) |
-| `delay` | 最近一次延迟(ms) |
 
 ### 6.2 GET `/proxies/:name` — 获取单个代理
 
@@ -420,6 +423,7 @@ curl -s "http://127.0.0.1:9090/proxies/🇺🇸%20US-01/delay?url=http://www.gst
 ```
 
 - 超时返回 `504`;测速失败/不可用返回 `503`。
+- 测速结果会写入该代理对象的 `history`(成功 `delay=ms`、`alive=true`;失败 `delay=0`、`alive=false`),随后可通过 `GET /proxies` 读取。
 
 ## 7. 策略组
 
